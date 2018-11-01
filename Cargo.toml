@@ -10,13 +10,17 @@ repository = "https://github.com/sharkdp/dup"
 version = "0.2.0"
 
 [[bin]]
-name = "fd"
+name = "dup"
 path = "src/main.rs"
 
 [dependencies]
 ignore = "0.4.3"
 num_cpus = "1.0"
 humansize = "1.1"
+
+[dependencies.clap]
+version = "2"
+features = ["suggestions", "color", "wrap_help"]
 
 [profile.release]
 lto = true
