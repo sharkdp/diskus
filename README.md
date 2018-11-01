@@ -60,8 +60,8 @@ hyperfine --warmup 5 'dup' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
 ### On Debian-based systems
 
 ``` bash
-wget "https://github.com/sharkdp/dup/releases/download/v0.1.0/dup_0.1.0_amd64.deb"
-sudo dpkg -i dup_0.1.0_amd64.deb
+wget "https://github.com/sharkdp/dup/releases/download/v0.2.0/dup_0.2.0_amd64.deb"
+sudo dpkg -i dup_0.2.0_amd64.deb
 ```
 
 ### On other distrubutions
