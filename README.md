@@ -1,5 +1,7 @@
 # dup
 
+[![Build Status](https://travis-ci.org/sharkdp/dup.svg?branch=master)](https://travis-ci.org/sharkdp/dup)
+
 *A minimal, fast alternative to `du -sh`.*
 
 `dup` is a very simple program that computes the total filesize of the current directory.
