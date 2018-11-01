@@ -12,6 +12,10 @@ The following benchmarks have been performed with [hyperfine](https://github.com
 a moderately large folder (15GB, 100k directories, 400k files). Smaller folders are not really of any
 interest since all programs would finish in a reasonable time that would not interrupt your workflow.
 
+In addition to `du` and `dup`, we also add [tin-summer](https://github.com/vmchale/tin-summer) (`sn`) in
+our comparison. It is a fully-featured replacement for (alternative to) `du` written in Rust, which you
+should check out.
+
 ### Cold disk cache
 
 ```bash
