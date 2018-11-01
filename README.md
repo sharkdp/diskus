@@ -6,6 +6,11 @@
 It is a parallelized version of `du -sh` or rather `du -sh --bytes`. On my 8-core laptop,
 it is about five times faster than `du`.
 
+``` bash
+> dup
+14.56 GB (14556806983 bytes)
+```
+
 ## Benchmark
 
 The following benchmarks have been performed with [hyperfine](https://github.com/sharkdp/hyperfine) on
