@@ -67,3 +67,9 @@ sudo dpkg -i dup_0.1.0_amd64.deb
 ### On other distrubutions
 
 Check out the [release page](https://github.com/sharkdp/dup/releases) for binary builds.
+
+### Via cargo
+
+```
+cargo install du-dup
+```
