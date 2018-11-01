@@ -55,3 +55,16 @@ hyperfine --warmup 5 'dup' 'sn p -d0 -j8' 'du -shb'
 | `dup` | 413.6 ± 3.8 | 405.9…420.5 |
 | `sn p -d0 -j8` | 613.6 ± 11.7 | 602.0…633.0 |
 | `du -shb` | 1112.2 ± 4.2 | 1104.9…1118.4 |
+
+## Installation
+
+### On Debian-based systems
+
+``` bash
+wget "https://github.com/sharkdp/dup/releases/download/v0.1.0/dup_0.1.0_amd64.deb"
+sudo dpkg -i dup_0.1.0_amd64.deb
+```
+
+### On other distrubutions
+
+Check out the [release page](https://github.com/sharkdp/dup/releases) for binary builds.
