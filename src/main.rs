@@ -49,21 +49,31 @@ fn main() {
     walker.run(|| {
         let tx = tx.clone();
         Box::new(move |result| {
-            if let Ok(entry) = result {
-                let metadata = entry.metadata().unwrap();
+            match result {
+                Ok(entry) => {
+                    if let Ok(metadata) = entry.metadata() {
+                        // If the entry has more than one hard link, generate
+                        // a unique ID consisting of device and inode in order
+                        // not to count this entry twice.
+                        let unique_id = if metadata.is_file() && metadata.nlink() > 1 {
+                            Some((metadata.dev(), metadata.ino()))
+                        } else {
+                            None
+                        };
 
-                // If the entry has more than one hard link, generate
-                // a unique ID consisting of device and inode in order
-                // not to count this entry twice.
-                let unique_id = if metadata.is_file() && metadata.nlink() > 1 {
-                    Some((metadata.dev(), metadata.ino()))
-                } else {
-                    None
-                };
+                        let size = metadata.len();
 
-                let size = metadata.len();
-
-                tx.send((unique_id, size)).unwrap();
+                        tx.send((unique_id, size)).ok();
+                    } else {
+                        eprintln!(
+                            "Could not get metadata: '{}'",
+                            entry.path().to_string_lossy()
+                        );
+                    }
+                }
+                Err(err) => {
+                    eprintln!("I/O error: {}", err);
+                }
             }
 
             return ignore::WalkState::Continue;
@@ -71,5 +81,5 @@ fn main() {
     });
 
     drop(tx);
-    receiver_thread.join().unwrap();
+    receiver_thread.join().ok();
 }
