@@ -20,7 +20,12 @@ fn main() {
     builder.git_exclude(false);
     builder.follow_links(false);
 
-    builder.threads(num_cpus::get());
+    // Setting the number of threads to 3x the number of cores is a good tradeoff between
+    // cold-cache and warm-cache runs. For a cold disk cache, we are limited by disk IO and
+    // therefore want the number of threads to be rather large in order for the IO scheduler to
+    // plan ahead. On the other hand, the number of threads shouldn't be too high for warm disk
+    // caches where we would otherwise pay a higher synchronization overhead.
+    builder.threads(3 * num_cpus::get());
 
     let walker = builder.build_parallel();
 

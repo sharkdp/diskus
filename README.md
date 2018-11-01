@@ -4,9 +4,9 @@
 
 *A minimal, fast alternative to `du -sh`.*
 
-`dup` is a very simple program that computes the total filesize of the current directory.
-It is a parallelized version of `du -sh` or rather `du -sh --bytes`. On my 8-core laptop,
-it is about five times faster than `du`.
+`dup` is a very simple program that computes the total size of the current directory. It is a
+parallelized version of `du -sh`. On my 8-core laptop, it is about nine times faster than `du` for
+a cold disk cache and more than twice as fast on a warm disk cache.
 
 ``` bash
 > dup
@@ -36,26 +36,24 @@ hyperfine --prepare 'sync; echo 3 | sudo tee /proc/sys/vm/drop_caches' \
 
 | Command | Mean [s] | Min…Max [s] |
 |:---|---:|---:|
-| `dup` | 3.212 ± 0.030 | 3.185…3.276 |
-| `sn p -d0 -j8` | 9.747 ± 0.089 | 9.646…9.908 |
-| `du -sb` | 16.001 ± 0.091 | 15.854…16.181 |
-| `dust -d0` | 19.921 ± 0.354 | 19.508…20.613 |
+| `dup` | 1.729 ± 0.012 | 1.717…1.756 |
+| `sn p -d0 -j8` | 9.778 ± 0.098 | 9.587…9.904 |
+| `du -sb` | 16.016 ± 0.067 | 15.923…16.147 |
+| `dust -d0` | 19.845 ± 0.466 | 19.428…20.948 |
 
 ### Warm disk cache
 
-On a warm disk cache, the differences are smaller. But I believe that in most situations where you are interested
-in total disk usage, you have a cold disk cache.
-
+On a warm disk cache, the differences are smaller:
 ```bash
 hyperfine --warmup 5 'dup' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
 ```
 
 | Command | Mean [ms] | Min…Max [ms] |
 |:---|---:|---:|
-| `dup` | 414.4 ± 7.1 | 404.9…425.3 |
-| `sn p -d0 -j8` | 606.6 ± 20.0 | 572.8…647.2 |
-| `du -sb` | 1105.2 ± 13.5 | 1089.3…1129.9 |
-| `dust -d0` | 3600.4 ± 23.5 | 3561.7…3649.5 |
+| `dup` | 465.9 ± 14.7 | 446.5…487.4 |
+| `sn p -d0 -j8` | 596.4 ± 12.2 | 579.2…615.9 |
+| `du -sb` | 1100.3 ± 20.5 | 1086.9…1153.0 |
+| `dust -d0` | 3560.1 ± 27.8 | 3521.7…3612.8 |
 
 ## Installation
 
