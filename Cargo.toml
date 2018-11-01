@@ -4,10 +4,14 @@ categories = ["command-line-utilities"]
 description = "A minimal, fast alternative to 'du -sh'."
 homepage = "https://github.com/sharkdp/dup"
 license = "MIT/Apache-2.0"
-name = "dup"
+name = "du-dup"
 readme = "README.md"
 repository = "https://github.com/sharkdp/dup"
-version = "0.1.0"
+version = "0.2.0"
+
+[[bin]]
+name = "fd"
+path = "src/main.rs"
 
 [dependencies]
 ignore = "0.4.3"
