@@ -14,7 +14,8 @@ interest since all programs would finish in a reasonable time that would not int
 
 In addition to `du` and `dup`, we also add [tin-summer](https://github.com/vmchale/tin-summer) (`sn`) in
 our comparison. It is a fully-featured replacement for (alternative to) `du` written in Rust, which you
-should check out.
+should check out. The optimal number of threads for `sn` (`-j` option) was determined
+via `hyperfine --parameter-scan`.
 
 ### Cold disk cache
 
