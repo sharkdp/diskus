@@ -2,16 +2,12 @@
 authors = ["David Peter <mail@david-peter.de>"]
 categories = ["command-line-utilities"]
 description = "A minimal, fast alternative to 'du -sh'."
-homepage = "https://github.com/sharkdp/dup"
+homepage = "https://github.com/sharkdp/diskus"
 license = "MIT/Apache-2.0"
-name = "du-dup"
+name = "diskus"
 readme = "README.md"
-repository = "https://github.com/sharkdp/dup"
+repository = "https://github.com/sharkdp/diskus"
 version = "0.2.0"
-
-[[bin]]
-name = "dup"
-path = "src/main.rs"
 
 [dependencies]
 ignore = "0.4.3"
