@@ -64,6 +64,10 @@ wget "https://github.com/sharkdp/dup/releases/download/v0.2.0/dup_0.2.0_amd64.de
 sudo dpkg -i dup_0.2.0_amd64.deb
 ```
 
+### On Arch-based systems
+
+Download from [the AUR](https://aur.archlinux.org/packages/du-dup-bin/) and install using `makepkg` or an AUR-helper
+
 ### On other distrubutions
 
 Check out the [release page](https://github.com/sharkdp/dup/releases) for binary builds.
