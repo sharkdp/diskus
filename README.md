@@ -64,6 +64,10 @@ wget "https://github.com/sharkdp/diskus/releases/download/v0.3.1/diskus_0.3.1_am
 sudo dpkg -i diskus_0.3.1_amd64.deb
 ```
 
+### On Arch-based systems
+
+Download from the AUR: [diskus](https://aur.archlinux.org/packages/diskus/) or [diskus-bin](https://aur.archlinux.org/packages/diskus/)
+
 ### On other distrubutions
 
 Check out the [release page](https://github.com/sharkdp/diskus/releases) for binary builds.
