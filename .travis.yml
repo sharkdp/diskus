@@ -12,6 +12,11 @@ matrix:
     - os: osx
       rust: stable
       env: TARGET=x86_64-apple-darwin
+    # Minimum Rust supported channel.
+    - os: linux
+      rust: 1.29.0
+      env: TARGET=x86_64-unknown-linux-gnu
+
 
 addons:
   apt:
