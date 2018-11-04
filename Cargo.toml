@@ -10,9 +10,9 @@ repository = "https://github.com/sharkdp/diskus"
 version = "0.3.1"
 
 [dependencies]
-ignore = "0.4.3"
 num_cpus = "1.0"
 humansize = "1.1"
+rayon = "1.0"
 
 [dependencies.clap]
 version = "2"
@@ -20,4 +20,4 @@ features = ["suggestions", "color", "wrap_help"]
 
 [profile.release]
 lto = true
-codegen-units = 1
+aodegen-units = 1
