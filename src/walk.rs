@@ -8,12 +8,16 @@ use crossbeam_channel as channel;
 
 use rayon::prelude::*;
 
-#[derive(Eq,PartialEq,Hash)]
+#[derive(Eq, PartialEq, Hash)]
 struct UniqueID(u64, u64);
 
-struct SizeEntry(Option<UniqueID>, u64);
+enum Message {
+    SizeEntry(Option<UniqueID>, u64),
+    NoMetadataForPath(PathBuf),
+    CouldNotReadDir(PathBuf),
+}
 
-fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
+fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
             // If the entry has more than one hard link, generate
@@ -27,20 +31,27 @@ fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
 
             let size = metadata.len();
 
-            tx_ref.send(SizeEntry(unique_id, size)).unwrap();
+            tx_ref.send(Message::SizeEntry(unique_id, size)).unwrap();
 
             if metadata.is_dir() {
                 let mut children = vec![];
-                for child_entry in fs::read_dir(entry).unwrap() {
-                    if let Ok(child_entry) = child_entry {
-                        children.push(child_entry.path());
+                match fs::read_dir(entry) {
+                    Ok(child_entries) => {
+                        for child_entry in child_entries {
+                            if let Ok(child_entry) = child_entry {
+                                children.push(child_entry.path());
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        tx_ref.send(Message::CouldNotReadDir(entry.clone())).unwrap();
                     }
                 }
 
                 walk(tx_ref.clone(), &children[..]);
             };
         } else {
-            eprintln!("Could not get file metadata: '{}'", entry.to_string_lossy());
+            tx_ref.send(Message::NoMetadataForPath(entry.clone())).unwrap();
         };
     });
 }
@@ -64,14 +75,24 @@ impl<'a> Walk<'a> {
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
             let mut ids = HashSet::new();
-            for SizeEntry(unique_id, size) in rx {
-                if let Some(unique_id) = unique_id {
-                    // Only count this entry if the ID has not been seen
-                    if ids.insert(unique_id) {
-                        total += size;
+            for msg in rx {
+                match msg {
+                    Message::SizeEntry(unique_id, size) => {
+                        if let Some(unique_id) = unique_id {
+                            // Only count this entry if the ID has not been seen
+                            if ids.insert(unique_id) {
+                                total += size;
+                            }
+                        } else {
+                            total += size;
+                        }
                     }
-                } else {
-                    total += size;
+                    Message::NoMetadataForPath(path) => {
+                        eprintln!("diskus: could not metadata for path '{}'", path.to_string_lossy());
+                    }
+                    Message::CouldNotReadDir(path) => {
+                        eprintln!("diskus: could not contents of directory '{}'", path.to_string_lossy());
+                    }
                 }
             }
 
