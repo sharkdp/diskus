@@ -6,6 +6,7 @@ use std::thread;
 
 use crossbeam_channel as channel;
 
+use rayon;
 use rayon::prelude::*;
 
 #[derive(Eq, PartialEq, Hash)]
