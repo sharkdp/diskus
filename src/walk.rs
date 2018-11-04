@@ -8,9 +8,10 @@ use crossbeam_channel as channel;
 
 use rayon::prelude::*;
 
-type UniqueID = (u64, u64);
+#[derive(Eq,PartialEq,Hash)]
+struct UniqueID(u64, u64);
 
-type SizeEntry = (Option<UniqueID>, u64);
+struct SizeEntry(Option<UniqueID>, u64);
 
 fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
@@ -19,14 +20,14 @@ fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
             // a unique ID consisting of device and inode in order
             // not to count this entry twice.
             let unique_id = if metadata.is_file() && metadata.nlink() > 1 {
-                Some((metadata.dev(), metadata.ino()))
+                Some(UniqueID(metadata.dev(), metadata.ino()))
             } else {
                 None
             };
 
             let size = metadata.len();
 
-            tx_ref.send((unique_id, size)).unwrap();
+            tx_ref.send(SizeEntry(unique_id, size)).unwrap();
 
             if metadata.is_dir() {
                 let mut children = vec![];
@@ -63,7 +64,7 @@ impl<'a> Walk<'a> {
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
             let mut ids = HashSet::new();
-            for (unique_id, size) in rx {
+            for SizeEntry(unique_id, size) in rx {
                 if let Some(unique_id) = unique_id {
                     // Only count this entry if the ID has not been seen
                     if ids.insert(unique_id) {

@@ -51,7 +51,8 @@ fn main() {
         .and_then(|t| t.parse().ok())
         .unwrap_or(3 * num_cpus::get());
 
-    let paths = &[PathBuf::from(".")];
+    let root = PathBuf::from(".");
+    let paths = &[root];
     let walk = Walk::new(paths, num_threads);
     let size = walk.run();
     print_result(size);
