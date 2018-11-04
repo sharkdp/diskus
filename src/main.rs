@@ -31,6 +31,11 @@ fn main() {
         .version(crate_version!())
         .about("Compute disk usage for the current directory")
         .arg(
+            Arg::with_name("path")
+                .multiple(true)
+                .help("List of filesystem paths"),
+        )
+        .arg(
             Arg::with_name("threads")
                 .long("threads")
                 .short("j")
@@ -51,9 +56,12 @@ fn main() {
         .and_then(|t| t.parse().ok())
         .unwrap_or(3 * num_cpus::get());
 
-    let root = PathBuf::from(".");
-    let paths = &[root];
-    let walk = Walk::new(paths, num_threads);
+    let paths: Vec<PathBuf> = matches
+        .values_of("path")
+        .map(|paths| paths.map(PathBuf::from).collect())
+        .unwrap_or(vec![PathBuf::from(".")]);
+
+    let walk = Walk::new(&paths, num_threads);
     let size = walk.run();
     print_result(size);
 }

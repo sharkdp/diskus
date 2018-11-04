@@ -43,15 +43,19 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
                             }
                         }
                     }
-                    Err(err) => {
-                        tx_ref.send(Message::CouldNotReadDir(entry.clone())).unwrap();
+                    Err(_) => {
+                        tx_ref
+                            .send(Message::CouldNotReadDir(entry.clone()))
+                            .unwrap();
                     }
                 }
 
                 walk(tx_ref.clone(), &children[..]);
             };
         } else {
-            tx_ref.send(Message::NoMetadataForPath(entry.clone())).unwrap();
+            tx_ref
+                .send(Message::NoMetadataForPath(entry.clone()))
+                .unwrap();
         };
     });
 }
@@ -88,10 +92,16 @@ impl<'a> Walk<'a> {
                         }
                     }
                     Message::NoMetadataForPath(path) => {
-                        eprintln!("diskus: could not metadata for path '{}'", path.to_string_lossy());
+                        eprintln!(
+                            "diskus: could not metadata for path '{}'",
+                            path.to_string_lossy()
+                        );
                     }
                     Message::CouldNotReadDir(path) => {
-                        eprintln!("diskus: could not contents of directory '{}'", path.to_string_lossy());
+                        eprintln!(
+                            "diskus: could not contents of directory '{}'",
+                            path.to_string_lossy()
+                        );
                     }
                 }
             }
