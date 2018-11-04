@@ -14,7 +14,7 @@ type SizeEntry = (Option<UniqueID>, u64);
 
 fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
-        if let Ok(metadata) = entry.metadata() {
+        if let Ok(metadata) = entry.symlink_metadata() {
             // If the entry has more than one hard link, generate
             // a unique ID consisting of device and inode in order
             // not to count this entry twice.
@@ -32,15 +32,14 @@ fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
                 let mut children = vec![];
                 for child_entry in fs::read_dir(entry).unwrap() {
                     if let Ok(child_entry) = child_entry {
-                        let path = child_entry.path();
-                        children.push(PathBuf::from(path));
+                        children.push(child_entry.path());
                     }
                 }
 
                 walk(tx_ref.clone(), &children[..]);
             };
         } else {
-            eprintln!("Could not get metadata: '{}'", entry.to_string_lossy());
+            eprintln!("Could not get file metadata: '{}'", entry.to_string_lossy());
         };
     });
 }
