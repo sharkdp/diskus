@@ -21,4 +21,4 @@ features = ["suggestions", "color", "wrap_help"]
 
 [profile.release]
 lto = true
-aodegen-units = 1
+codegen-units = 1
