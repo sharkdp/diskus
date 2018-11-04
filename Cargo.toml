@@ -7,7 +7,7 @@ license = "MIT/Apache-2.0"
 name = "diskus"
 readme = "README.md"
 repository = "https://github.com/sharkdp/diskus"
-version = "0.3.1"
+version = "0.4.0"
 
 [dependencies]
 num_cpus = "1.0"
