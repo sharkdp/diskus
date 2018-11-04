@@ -3,6 +3,7 @@ extern crate clap;
 extern crate humansize;
 extern crate num_cpus;
 extern crate rayon;
+extern crate crossbeam_channel;
 
 mod walk;
 

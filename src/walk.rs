@@ -2,8 +2,9 @@ use std::collections::HashSet;
 use std::fs;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
-use std::sync::mpsc::{channel, Sender};
 use std::thread;
+
+use crossbeam_channel as channel;
 
 use rayon::prelude::*;
 
@@ -11,8 +12,8 @@ type UniqueID = (u64, u64);
 
 type SizeEntry = (Option<UniqueID>, u64);
 
-fn walk(tx: Sender<SizeEntry>, entries: &[PathBuf]) {
-    entries.par_iter().for_each_with(tx, |tx_ref, entry| {
+fn walk(tx: channel::Sender<SizeEntry>, entries: &[PathBuf]) {
+    entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.metadata() {
             // If the entry has more than one hard link, generate
             // a unique ID consisting of device and inode in order
@@ -26,20 +27,20 @@ fn walk(tx: Sender<SizeEntry>, entries: &[PathBuf]) {
             let size = metadata.len();
 
             tx_ref.send((unique_id, size)).unwrap();
+
+            if metadata.is_dir() {
+                let mut children = vec![];
+                for child_entry in fs::read_dir(entry).unwrap() {
+                    if let Ok(child_entry) = child_entry {
+                        let path = child_entry.path();
+                        children.push(PathBuf::from(path));
+                    }
+                }
+
+                walk(tx_ref.clone(), &children[..]);
+            };
         } else {
             eprintln!("Could not get metadata: '{}'", entry.to_string_lossy());
-        };
-
-        if entry.is_dir() {
-            let mut children = vec![];
-            for child_entry in fs::read_dir(entry).unwrap() {
-                if let Ok(child_entry) = child_entry {
-                    let path = child_entry.path();
-                    children.push(PathBuf::from(path));
-                }
-            }
-
-            walk(tx_ref.clone(), &children[..]);
         };
     });
 }
@@ -58,7 +59,7 @@ impl<'a> Walk<'a> {
     }
 
     pub fn run(&self) -> u64 {
-        let (tx, rx) = channel();
+        let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
