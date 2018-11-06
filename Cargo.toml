@@ -1,3 +1,5 @@
+cargo-features = ["publish-lockfile"]
+
 [package]
 authors = ["David Peter <mail@david-peter.de>"]
 categories = ["command-line-utilities"]
@@ -8,6 +10,7 @@ name = "diskus"
 readme = "README.md"
 repository = "https://github.com/sharkdp/diskus"
 version = "0.4.0"
+publish-lockfile = true
 
 [dependencies]
 num_cpus = "1.0"
