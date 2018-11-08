@@ -1,6 +1,8 @@
 language: rust
 cache: cargo
 matrix:
+  allow_failures:
+    - os: windows
   include:
     # Stable channel.
     - os: linux
@@ -12,14 +14,13 @@ matrix:
     - os: osx
       rust: stable
       env: TARGET=x86_64-apple-darwin
+    - os: windows
+      rust: stable
+      env: TARGET=x86_64-pc-windows-msvc
     # Minimum Rust supported channel.
     - os: linux
       rust: 1.29.0
       env: TARGET=x86_64-unknown-linux-gnu
-    - os: windows
-      rust: stable
-      env: TARGET=x86_64-pc-windows-msvc
-
 
 addons:
   apt:
