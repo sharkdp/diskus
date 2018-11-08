@@ -16,6 +16,9 @@ matrix:
     - os: linux
       rust: 1.29.0
       env: TARGET=x86_64-unknown-linux-gnu
+    - os: windows
+      rust: stable
+      env: TARGET=x86_64-pc-windows-msvc
 
 
 addons:
