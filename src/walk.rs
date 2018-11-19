@@ -61,6 +61,18 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
     });
 }
 
+/// Basic usage of diskus library
+///
+/// # Example:
+///
+/// ```rust
+/// fn foo() {
+///     let path = PathBuf::from("/");
+///     let paths = vec![path];
+///     let walk = Walk::new(&paths, 4);
+///     let size = walk.run();
+/// }
+/// ```
 pub struct Walk<'a> {
     root_directories: &'a [PathBuf],
     threads: usize,
