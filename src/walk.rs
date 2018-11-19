@@ -94,13 +94,13 @@ impl<'a> Walk<'a> {
                     }
                     Message::NoMetadataForPath(path) => {
                         eprintln!(
-                            "diskus: could not metadata for path '{}'",
+                            "diskus: could not find metadata for path '{}'",
                             path.to_string_lossy()
                         );
                     }
                     Message::CouldNotReadDir(path) => {
                         eprintln!(
-                            "diskus: could not contents of directory '{}'",
+                            "diskus: could not read contents of directory '{}'",
                             path.to_string_lossy()
                         );
                     }
