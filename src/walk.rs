@@ -94,7 +94,7 @@ impl<'a> Walk<'a> {
                     }
                     Message::NoMetadataForPath(path) => {
                         eprintln!(
-                            "diskus: could not find metadata for path '{}'",
+                            "diskus: could not retrieve metadata for path '{}'",
                             path.to_string_lossy()
                         );
                     }
