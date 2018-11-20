@@ -70,7 +70,19 @@ sudo dpkg -i diskus_0.4.0_amd64.deb
 
 Download from the AUR: [diskus](https://aur.archlinux.org/packages/diskus/) or [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/)
 
-### On other distrubutions
+### On Void-based systems
+
+``` bash
+xbps-install diskus
+```
+
+### On Haiku
+
+``` bash
+pkgman install diskus
+```
+
+### On other systems
 
 Check out the [release page](https://github.com/sharkdp/diskus/releases) for binary builds.
 
