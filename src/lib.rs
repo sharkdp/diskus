@@ -13,6 +13,7 @@ pub mod walk;
 /// extern crate diskus;
 /// 
 /// use diskus::Walk;
+/// use std::path::PathBuf;
 /// 
 /// let path = PathBuf::from("/");
 /// let paths = vec![path];
