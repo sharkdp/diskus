@@ -63,14 +63,14 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
 
 pub struct Walk<'a> {
     root_directories: &'a [PathBuf],
-    threads: usize,
+    num_threads: usize,
 }
 
 impl<'a> Walk<'a> {
-    pub fn new(root_directories: &'a [PathBuf], threads: usize) -> Walk {
+    pub fn new(root_directories: &'a [PathBuf], num_threads: usize) -> Walk {
         Walk {
             root_directories,
-            threads,
+            num_threads,
         }
     }
 
@@ -111,7 +111,7 @@ impl<'a> Walk<'a> {
         });
 
         let pool = rayon::ThreadPoolBuilder::new()
-            .num_threads(self.threads)
+            .num_threads(self.num_threads)
             .build()
             .unwrap();
         pool.install(|| walk(tx, self.root_directories));

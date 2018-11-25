@@ -59,7 +59,7 @@ fn main() {
     let paths: Vec<PathBuf> = matches
         .values_of("path")
         .map(|paths| paths.map(PathBuf::from).collect())
-        .unwrap_or(vec![PathBuf::from(".")]);
+        .unwrap_or_else(|| vec![PathBuf::from(".")]);
 
     let walk = Walk::new(&paths, num_threads);
     let size = walk.run();
