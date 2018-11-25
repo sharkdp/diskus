@@ -62,8 +62,8 @@ hyperfine --warmup 5 'diskus' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
 ### On Debian-based systems
 
 ``` bash
-wget "https://github.com/sharkdp/diskus/releases/download/v0.4.0/diskus_0.4.0_amd64.deb"
-sudo dpkg -i diskus_0.4.0_amd64.deb
+wget "https://github.com/sharkdp/diskus/releases/download/v0.5.0/diskus_0.5.0_amd64.deb"
+sudo dpkg -i diskus_0.5.0_amd64.deb
 ```
 
 ### On Arch-based systems
