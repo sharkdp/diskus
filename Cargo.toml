@@ -22,7 +22,3 @@ features = ["suggestions", "color", "wrap_help"]
 [profile.release]
 lto = true
 codegen-units = 1
-
-[lib]
-name = "diskus"
-path = "src/lib.rs"
