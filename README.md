@@ -68,7 +68,11 @@ sudo dpkg -i diskus_0.5.0_amd64.deb
 
 ### On Arch-based systems
 
-Download from the AUR: [diskus](https://aur.archlinux.org/packages/diskus/) or [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/)
+``` bash
+pacman -Syu diskus
+```
+
+Or download [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/) from the AUR.
 
 ### On Void-based systems
 
