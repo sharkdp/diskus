@@ -86,6 +86,14 @@ xbps-install diskus
 pkgman install diskus
 ```
 
+### On NixOS
+
+```
+nix-env -iA nixos.diskus
+```
+
+Or add it to `environment.systemPackages` in your `configuration.nix`.
+
 ### On other systems
 
 Check out the [release page](https://github.com/sharkdp/diskus/releases) for binary builds.
