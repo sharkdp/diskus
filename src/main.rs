@@ -14,11 +14,12 @@ use humansize::{file_size_opts, FileSize};
 
 use walk::Walk;
 
-fn print_result(size: u64) {
+fn print_result(size: u64, count: u64) {
     println!(
-        "{} ({} bytes)",
+        "{} ({} bytes, {} total files)",
         size.file_size(file_size_opts::DECIMAL).unwrap(),
-        size
+        size,
+        count
     );
 }
 
@@ -62,6 +63,6 @@ fn main() {
         .unwrap_or_else(|| vec![PathBuf::from(".")]);
 
     let walk = Walk::new(&paths, num_threads);
-    let size = walk.run();
-    print_result(size);
+    let (size, count) = walk.run();
+    print_result(size, count);
 }

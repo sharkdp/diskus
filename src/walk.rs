@@ -74,11 +74,12 @@ impl<'a> Walk<'a> {
         }
     }
 
-    pub fn run(&self) -> u64 {
+    pub fn run(&self) -> (u64, u64) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
+            let mut file_count = 0;
             let mut ids = HashSet::new();
             for msg in rx {
                 match msg {
@@ -87,9 +88,11 @@ impl<'a> Walk<'a> {
                             // Only count this entry if the ID has not been seen
                             if ids.insert(unique_id) {
                                 total += size;
+                                file_count += 1;
                             }
                         } else {
                             total += size;
+                            file_count += 1;
                         }
                     }
                     Message::NoMetadataForPath(path) => {
@@ -107,7 +110,7 @@ impl<'a> Walk<'a> {
                 }
             }
 
-            total
+            (total, file_count)
         });
 
         let pool = rayon::ThreadPoolBuilder::new()
