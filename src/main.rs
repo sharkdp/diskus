@@ -14,12 +14,39 @@ use humansize::{file_size_opts, FileSize};
 
 use walk::Walk;
 
-fn print_result(size: u64) {
+fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
+    let tainted = errors.iter().any(|x| {
+        if let walk::Err::NoMetadataForPath(_) = x {
+            true
+        } else {
+            false
+        }
+    });
     println!(
         "{} ({} bytes)",
         size.file_size(file_size_opts::DECIMAL).unwrap(),
         size
     );
+    if verbose {
+        for err in errors {
+            match err {
+                walk::Err::NoMetadataForPath(path) => {
+                    eprintln!(
+                        "diskus: could not retrieve metadata for path '{}'",
+                        path.to_string_lossy()
+                    );
+                }
+                walk::Err::CouldNotReadDir(path) => {
+                    eprintln!(
+                        "diskus: could not read contents of directory '{}'",
+                        path.to_string_lossy()
+                    );
+                }
+            }
+        }
+    } else if tainted {
+        println!("Warning, results may be tainted. Try running with --verbose.");
+    }
 }
 
 fn main() {
@@ -42,6 +69,13 @@ fn main() {
                 .value_name("N")
                 .takes_value(true)
                 .help("Set the number of threads (default: 3 x num cores)"),
+        )
+        .arg(
+            Arg::with_name("verbose")
+                .long("verbose")
+                .short("v")
+                .takes_value(false)
+                .help("Emits verbose output"),
         );
 
     let matches = app.get_matches();
@@ -61,7 +95,9 @@ fn main() {
         .map(|paths| paths.map(PathBuf::from).collect())
         .unwrap_or_else(|| vec![PathBuf::from(".")]);
 
+    let verbose = matches.is_present("verbose");
+
     let walk = Walk::new(&paths, num_threads);
-    let size = walk.run();
-    print_result(size);
+    let (size, errors) = walk.run();
+    print_result(size, &errors, verbose);
 }

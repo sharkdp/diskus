@@ -21,10 +21,13 @@ mod unix;
 #[cfg(not(target_os = "windows"))]
 pub use self::unix::*;
 
-enum Message {
-    SizeEntry(Option<UniqueID>, u64),
+pub enum Err {
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
+}
+enum Message {
+    SizeEntry(Option<UniqueID>, u64),
+    Error { err: Err },
 }
 
 fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
@@ -48,7 +51,9 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
                     }
                     Err(_) => {
                         tx_ref
-                            .send(Message::CouldNotReadDir(entry.clone()))
+                            .send(Message::Error {
+                                err: Err::CouldNotReadDir(entry.clone()),
+                            })
                             .unwrap();
                     }
                 }
@@ -57,7 +62,9 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
             };
         } else {
             tx_ref
-                .send(Message::NoMetadataForPath(entry.clone()))
+                .send(Message::Error {
+                    err: Err::NoMetadataForPath(entry.clone()),
+                })
                 .unwrap();
         };
     });
@@ -76,12 +83,13 @@ impl<'a> Walk<'a> {
         }
     }
 
-    pub fn run(&self) -> u64 {
+    pub fn run(&self) -> (u64, Vec<Err>) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
             let mut ids = HashSet::new();
+            let mut error_messages: Vec<Err> = Vec::new();
             for msg in rx {
                 match msg {
                     Message::SizeEntry(unique_id, size) => {
@@ -94,22 +102,12 @@ impl<'a> Walk<'a> {
                             total += size;
                         }
                     }
-                    Message::NoMetadataForPath(path) => {
-                        eprintln!(
-                            "diskus: could not retrieve metadata for path '{}'",
-                            path.to_string_lossy()
-                        );
-                    }
-                    Message::CouldNotReadDir(path) => {
-                        eprintln!(
-                            "diskus: could not read contents of directory '{}'",
-                            path.to_string_lossy()
-                        );
+                    Message::Error { err } => {
+                        error_messages.push(err);
                     }
                 }
             }
-
-            total
+            (total, error_messages)
         });
 
         let pool = rayon::ThreadPoolBuilder::new()
