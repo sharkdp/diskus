@@ -80,6 +80,18 @@ Or download [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/) from th
 xbps-install diskus
 ```
 
+### On macOS
+
+You can install `diskus` with [Homebrew](https://formulae.brew.sh/formula/diskus):
+```
+brew install diskus
+```
+
+… or with [MacPorts](https://ports.macports.org/port/diskus/summary):
+```
+sudo port install diskus
+```
+
 ### On Haiku
 
 ``` bash
