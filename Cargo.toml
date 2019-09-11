@@ -12,8 +12,8 @@ version = "0.5.0"
 [dependencies]
 num_cpus = "1.0"
 humansize = "1.1"
-rayon = "1.0"
 crossbeam-channel = "0.3.0"
+crossbeam-utils = "0.6.5"
 
 [dependencies.clap]
 version = "2"
