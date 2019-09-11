@@ -87,7 +87,7 @@ You can install `diskus` with [Homebrew](https://formulae.brew.sh/formula/diskus
 brew install diskus
 ```
 
-… or with [MacPorts](https://ports.macports.org/port/diskus/summary):
+Or with [MacPorts](https://ports.macports.org/port/diskus/summary):
 ```
 sudo port install diskus
 ```
