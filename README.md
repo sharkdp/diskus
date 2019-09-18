@@ -125,3 +125,17 @@ Licensed under either of
  * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
+
+
+## Windows caveats
+
+ Since even the Windows-internal tools such as (but not limited to)
+ - Powershell,
+ - Explorer,
+ - dir,
+ 
+ are not respecting hardlinks or junction points when determining the
+ size of a directory, it has been decided that diskus will count
+ any such entries multiple times. too. See  
+ https://github.com/sharkdp/diskus/issues/32#issuecomment-532817905 for
+ an example of this behaviour.

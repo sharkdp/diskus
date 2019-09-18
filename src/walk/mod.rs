@@ -1,6 +1,5 @@
 use std::collections::HashSet;
 use std::fs;
-use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use std::thread;
 
@@ -10,7 +9,17 @@ use rayon;
 use rayon::prelude::*;
 
 #[derive(Eq, PartialEq, Hash)]
-struct UniqueID(u64, u64);
+pub struct UniqueID(u64, u64);
+
+#[cfg(target_os = "windows")]
+mod windows;
+#[cfg(target_os = "windows")]
+pub use self::windows::*;
+
+#[cfg(not(target_os = "windows"))]
+mod unix;
+#[cfg(not(target_os = "windows"))]
+pub use self::unix::*;
 
 enum Message {
     SizeEntry(Option<UniqueID>, u64),
@@ -21,14 +30,7 @@ enum Message {
 fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
-            // If the entry has more than one hard link, generate
-            // a unique ID consisting of device and inode in order
-            // not to count this entry twice.
-            let unique_id = if metadata.is_file() && metadata.nlink() > 1 {
-                Some(UniqueID(metadata.dev(), metadata.ino()))
-            } else {
-                None
-            };
+            let unique_id = generate_unique_id(&metadata);
 
             let size = metadata.len();
 
