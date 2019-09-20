@@ -119,17 +119,10 @@ cargo install diskus
 
 ## Windows caveats
 
- Since even the Windows-internal tools such as (but not limited to)
- - Powershell,
- - Explorer,
- - dir,
- 
- are not respecting hardlinks or junction points when determining the
- size of a directory, it has been decided that diskus will count
- any such entries multiple times. too. See  
- https://github.com/sharkdp/diskus/issues/32#issuecomment-532817905 for
- an example of this behaviour.
-
+Windows-internal tools such as Powershell, Explorer or `dir` are not respecting hardlinks or
+junction points when determining the size of a directory. `diskus` does the same and counts
+such entries multiple times (on Unix systems, multiple hardlinks to a single file are counted
+just once).
 
 ## License
 
