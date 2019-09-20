@@ -117,16 +117,6 @@ If you have Rust 1.29 or higher, you can install `diskus` from source via `cargo
 cargo install diskus
 ```
 
-## License
-
-Licensed under either of
-
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-
 ## Windows caveats
 
  Since even the Windows-internal tools such as (but not limited to)
@@ -139,3 +129,13 @@ at your option.
  any such entries multiple times. too. See  
  https://github.com/sharkdp/diskus/issues/32#issuecomment-532817905 for
  an example of this behaviour.
+
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
