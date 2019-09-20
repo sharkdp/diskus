@@ -15,13 +15,6 @@ use humansize::{file_size_opts, FileSize};
 use walk::Walk;
 
 fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
-    let tainted = errors.iter().any(|x| {
-        if let walk::Err::NoMetadataForPath(_) = x {
-            true
-        } else {
-            false
-        }
-    });
     println!(
         "{} ({} bytes)",
         size.file_size(file_size_opts::DECIMAL).unwrap(),
@@ -44,8 +37,10 @@ fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
                 }
             }
         }
-    } else if tainted {
-        println!("Warning, results may be tainted. Try running with --verbose.");
+    } else if !errors.is_empty() {
+        eprintln!(
+            "Warning: the results may be tainted. Re-run with -v/--verbose to print all errors."
+        );
     }
 }
 
