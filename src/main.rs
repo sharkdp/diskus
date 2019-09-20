@@ -15,11 +15,6 @@ use humansize::{file_size_opts, FileSize};
 use walk::Walk;
 
 fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
-    println!(
-        "{} ({} bytes)",
-        size.file_size(file_size_opts::DECIMAL).unwrap(),
-        size
-    );
     if verbose {
         for err in errors {
             match err {
@@ -39,9 +34,14 @@ fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
         }
     } else if !errors.is_empty() {
         eprintln!(
-            "Warning: the results may be tainted. Re-run with -v/--verbose to print all errors."
+            "[diskus warning] the results may be tainted. Re-run with -v/--verbose to print all errors."
         );
     }
+    println!(
+        "{} ({} bytes)",
+        size.file_size(file_size_opts::DECIMAL).unwrap(),
+        size
+    );
 }
 
 fn main() {
