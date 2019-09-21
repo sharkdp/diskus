@@ -64,7 +64,7 @@ fn main() {
                 .long("verbose")
                 .short("v")
                 .takes_value(false)
-                .help("Emits verbose output"),
+                .help("Do not hide filesystem errors"),
         );
 
     let matches = app.get_matches();
