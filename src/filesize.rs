@@ -10,9 +10,9 @@ impl FilesizeType {
         use std::os::unix::fs::MetadataExt;
 
         match self {
-            Self::ApparentSize => metadata.len(),
+            FilesizeType::ApparentSize => metadata.len(),
             // block size is always 512 byte, see stat(2) manpage
-            Self::DiskUsage => metadata.blocks() * 512,
+            FilesizeType::DiskUsage => metadata.blocks() * 512,
         }
     }
 
