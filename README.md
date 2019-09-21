@@ -72,7 +72,7 @@ sudo dpkg -i diskus_0.6.0_amd64.deb
 ### On Arch-based systems
 
 ``` bash
-pacman -Syu diskus
+pacman -S diskus
 ```
 
 Or download [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/) from the AUR.
