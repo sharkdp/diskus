@@ -1,0 +1,31 @@
+.TH DISKUS "1"
+.SH NAME
+diskus - Compute disk usage for the given filesystem entries
+.SH SYNOPSIS
+.B diskus
+.RB [OPTIONS]
+.RB [path...]
+.SH OPTIONS
+.TP
+\fB\-j\fR, \fB\-\-threads\fR <N>
+Set the number of threads (default: 3 x num cores)
+.TP
+\fB\-\-size\-format\fR <type>
+Output format for file sizes (decimal: MB, binary: MiB) [default: decimal]
+[possible values: decimal, binary]
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Do not hide filesystem errors
+.TP
+\fB\-b\fR, \fB\-\-apparent\-size\fR
+Compute apparent size instead of disk usage
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Prints help information
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Prints version information
+.SH ARGUMENTS
+.TP
+<path>...
+List of filesystem paths
