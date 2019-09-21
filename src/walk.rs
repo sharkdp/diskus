@@ -9,14 +9,14 @@ use rayon::{self, prelude::*};
 
 use crate::unique_id::{generate_unique_id, UniqueID};
 
-pub enum Err {
+pub enum Error {
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
 }
 
 enum Message {
     SizeEntry(Option<UniqueID>, u64),
-    Error { err: Err },
+    Error { error: Error },
 }
 
 fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
@@ -41,7 +41,7 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
                     Err(_) => {
                         tx_ref
                             .send(Message::Error {
-                                err: Err::CouldNotReadDir(entry.clone()),
+                                error: Error::CouldNotReadDir(entry.clone()),
                             })
                             .unwrap();
                     }
@@ -52,7 +52,7 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
         } else {
             tx_ref
                 .send(Message::Error {
-                    err: Err::NoMetadataForPath(entry.clone()),
+                    error: Error::NoMetadataForPath(entry.clone()),
                 })
                 .unwrap();
         };
@@ -72,13 +72,13 @@ impl<'a> Walk<'a> {
         }
     }
 
-    pub fn run(&self) -> (u64, Vec<Err>) {
+    pub fn run(&self) -> (u64, Vec<Error>) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
             let mut ids = HashSet::new();
-            let mut error_messages: Vec<Err> = Vec::new();
+            let mut error_messages: Vec<Error> = Vec::new();
             for msg in rx {
                 match msg {
                     Message::SizeEntry(unique_id, size) => {
@@ -91,8 +91,8 @@ impl<'a> Walk<'a> {
                             total += size;
                         }
                     }
-                    Message::Error { err } => {
-                        error_messages.push(err);
+                    Message::Error { error } => {
+                        error_messages.push(error);
                     }
                 }
             }

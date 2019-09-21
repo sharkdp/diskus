@@ -7,17 +7,17 @@ use num_format::{Locale, ToFormattedString};
 
 use diskus::walk::{self, Walk};
 
-fn print_result(size: u64, errors: &[walk::Err], size_format: &FileSizeOpts, verbose: bool) {
+fn print_result(size: u64, errors: &[walk::Error], size_format: &FileSizeOpts, verbose: bool) {
     if verbose {
         for err in errors {
             match err {
-                walk::Err::NoMetadataForPath(path) => {
+                walk::Error::NoMetadataForPath(path) => {
                     eprintln!(
                         "diskus: could not retrieve metadata for path '{}'",
                         path.to_string_lossy()
                     );
                 }
-                walk::Err::CouldNotReadDir(path) => {
+                walk::Error::CouldNotReadDir(path) => {
                     eprintln!(
                         "diskus: could not read contents of directory '{}'",
                         path.to_string_lossy()
