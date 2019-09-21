@@ -32,11 +32,16 @@ fn print_result(size: u64, errors: &[walk::Err], size_format: &FileSizeOpts, ver
             "[diskus warning] the results may be tainted. Re-run with -v/--verbose to print all errors."
         );
     }
-    println!(
-        "{} ({:} bytes)",
-        size.file_size(size_format).unwrap(),
-        size.to_formatted_string(&Locale::en)
-    );
+
+    if atty::is(atty::Stream::Stdout) {
+        println!(
+            "{} ({:} bytes)",
+            size.file_size(size_format).unwrap(),
+            size.to_formatted_string(&Locale::en)
+        );
+    } else {
+        println!("{}", size);
+    }
 }
 
 fn main() {
