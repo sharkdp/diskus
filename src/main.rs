@@ -1,18 +1,11 @@
-#[macro_use]
-extern crate clap;
-extern crate crossbeam_channel;
-extern crate humansize;
-extern crate num_cpus;
-extern crate rayon;
-
 mod walk;
 
 use std::path::PathBuf;
 
-use clap::{App, AppSettings, Arg};
+use clap::{crate_name, crate_version, App, AppSettings, Arg};
 use humansize::{file_size_opts, FileSize};
 
-use walk::Walk;
+use crate::walk::Walk;
 
 fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
     if verbose {

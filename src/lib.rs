@@ -1,8 +1,6 @@
 //! # Basic usage
 //!
 //! ```
-//! extern crate diskus;
-//!
 //! use std::path::PathBuf;
 //! use diskus::Walk;
 //!
@@ -12,11 +10,6 @@
 //! let size_in_bytes = walk.run();
 //! ```
 
-extern crate crossbeam_channel;
-extern crate humansize;
-extern crate num_cpus;
-extern crate rayon;
-
 pub mod walk;
 
-pub use walk::Walk;
+pub use crate::walk::Walk;
