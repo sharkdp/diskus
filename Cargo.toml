@@ -20,6 +20,9 @@ crossbeam-channel = "0.3.0"
 version = "2"
 features = ["suggestions", "color", "wrap_help"]
 
+[dev-dependencies]
+tempdir = "0.3"
+
 [profile.release]
 lto = true
 codegen-units = 1
