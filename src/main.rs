@@ -5,19 +5,19 @@ use humansize::file_size_opts::{self, FileSizeOpts};
 use humansize::FileSize;
 use num_format::{Locale, ToFormattedString};
 
-use diskus::walk::{self, Walk};
+use diskus::{Error, FilesizeType, Walk};
 
-fn print_result(size: u64, errors: &[walk::Error], size_format: &FileSizeOpts, verbose: bool) {
+fn print_result(size: u64, errors: &[Error], size_format: &FileSizeOpts, verbose: bool) {
     if verbose {
         for err in errors {
             match err {
-                walk::Error::NoMetadataForPath(path) => {
+                Error::NoMetadataForPath(path) => {
                     eprintln!(
                         "diskus: could not retrieve metadata for path '{}'",
                         path.to_string_lossy()
                     );
                 }
-                walk::Error::CouldNotReadDir(path) => {
+                Error::CouldNotReadDir(path) => {
                     eprintln!(
                         "diskus: could not read contents of directory '{}'",
                         path.to_string_lossy()
@@ -80,6 +80,14 @@ fn main() {
                 .help("Do not hide filesystem errors"),
         );
 
+    #[cfg(not(windows))]
+    let app = app.arg(
+        Arg::with_name("apparent-size")
+            .long("apparent-size")
+            .short("b")
+            .help("Compute apparent size instead of disk usage"),
+    );
+
     let matches = app.get_matches();
 
     // Setting the number of threads to 3x the number of cores is a good tradeoff between
@@ -97,6 +105,12 @@ fn main() {
         .map(|paths| paths.map(PathBuf::from).collect())
         .unwrap_or_else(|| vec![PathBuf::from(".")]);
 
+    let filesize_type = if matches.is_present("apparent-size") {
+        FilesizeType::ApparentSize
+    } else {
+        FilesizeType::DiskUsage
+    };
+
     let size_format = match matches.value_of("size-format") {
         Some("decimal") => file_size_opts::DECIMAL,
         _ => file_size_opts::BINARY,
@@ -104,7 +118,7 @@ fn main() {
 
     let verbose = matches.is_present("verbose");
 
-    let walk = Walk::new(&paths, num_threads);
+    let walk = Walk::new(&paths, num_threads, filesize_type);
     let (size, errors) = walk.run();
     print_result(size, &errors, &size_format, verbose);
 }

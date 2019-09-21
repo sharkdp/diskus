@@ -7,6 +7,7 @@ use crossbeam_channel as channel;
 
 use rayon::{self, prelude::*};
 
+use crate::filesize::FilesizeType;
 use crate::unique_id::{generate_unique_id, UniqueID};
 
 pub enum Error {
@@ -19,12 +20,12 @@ enum Message {
     Error { error: Error },
 }
 
-fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
+fn walk(tx: channel::Sender<Message>, entries: &[PathBuf], filesize_type: FilesizeType) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
             let unique_id = generate_unique_id(&metadata);
 
-            let size = metadata.len();
+            let size = filesize_type.size(&metadata);
 
             tx_ref.send(Message::SizeEntry(unique_id, size)).unwrap();
 
@@ -47,7 +48,7 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
                     }
                 }
 
-                walk(tx_ref.clone(), &children[..]);
+                walk(tx_ref.clone(), &children[..], filesize_type);
             };
         } else {
             tx_ref
@@ -62,13 +63,19 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
 pub struct Walk<'a> {
     root_directories: &'a [PathBuf],
     num_threads: usize,
+    filesize_type: FilesizeType,
 }
 
 impl<'a> Walk<'a> {
-    pub fn new(root_directories: &'a [PathBuf], num_threads: usize) -> Walk {
+    pub fn new(
+        root_directories: &'a [PathBuf],
+        num_threads: usize,
+        filesize_type: FilesizeType,
+    ) -> Walk {
         Walk {
             root_directories,
             num_threads,
+            filesize_type,
         }
     }
 
@@ -103,7 +110,7 @@ impl<'a> Walk<'a> {
             .num_threads(self.num_threads)
             .build()
             .unwrap();
-        pool.install(|| walk(tx, self.root_directories));
+        pool.install(|| walk(tx, self.root_directories, self.filesize_type));
 
         receiver_thread.join().unwrap()
     }
