@@ -10,6 +10,7 @@
 //! let (size_in_bytes, errors) = walk.run();
 //! ```
 
+mod unique_id;
 pub mod walk;
 
 pub use crate::walk::Walk;

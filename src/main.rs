@@ -1,5 +1,3 @@
-mod walk;
-
 use std::path::PathBuf;
 
 use clap::{crate_name, crate_version, App, AppSettings, Arg};
@@ -7,7 +5,7 @@ use humansize::file_size_opts::{self, FileSizeOpts};
 use humansize::FileSize;
 use num_format::{Locale, ToFormattedString};
 
-use crate::walk::Walk;
+use diskus::walk::{self, Walk};
 
 fn print_result(size: u64, errors: &[walk::Err], size_format: &FileSizeOpts, verbose: bool) {
     if verbose {

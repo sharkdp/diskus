@@ -7,9 +7,7 @@ use crossbeam_channel as channel;
 
 use rayon::{self, prelude::*};
 
-mod unique_id;
-
-use unique_id::{generate_unique_id, UniqueID};
+use crate::unique_id::{generate_unique_id, UniqueID};
 
 pub enum Err {
     NoMetadataForPath(PathBuf),

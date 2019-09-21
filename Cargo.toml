@@ -25,6 +25,10 @@ features = ["suggestions", "color", "wrap_help"]
 [dev-dependencies]
 tempdir = "0.3"
 
+[[bin]]
+name = "diskus"
+path = "src/main.rs"
+
 [profile.release]
 lto = true
 codegen-units = 1
