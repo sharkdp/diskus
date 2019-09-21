@@ -3,12 +3,13 @@ mod walk;
 use std::path::PathBuf;
 
 use clap::{crate_name, crate_version, App, AppSettings, Arg};
-use humansize::{file_size_opts, FileSize};
+use humansize::file_size_opts::{self, FileSizeOpts};
+use humansize::FileSize;
 use num_format::{Locale, ToFormattedString};
 
 use crate::walk::Walk;
 
-fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
+fn print_result(size: u64, errors: &[walk::Err], size_format: &FileSizeOpts, verbose: bool) {
     if verbose {
         for err in errors {
             match err {
@@ -33,7 +34,7 @@ fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
     }
     println!(
         "{} ({:} bytes)",
-        size.file_size(file_size_opts::DECIMAL).unwrap(),
+        size.file_size(size_format).unwrap(),
         size.to_formatted_string(&Locale::en)
     );
 }
@@ -60,6 +61,15 @@ fn main() {
                 .help("Set the number of threads (default: 3 x num cores)"),
         )
         .arg(
+            Arg::with_name("size-format")
+                .long("size-format")
+                .takes_value(true)
+                .value_name("type")
+                .possible_values(&["decimal", "binary"])
+                .default_value("decimal")
+                .help("Output format for file sizes (decimal: MB, binary: MiB)"),
+        )
+        .arg(
             Arg::with_name("verbose")
                 .long("verbose")
                 .short("v")
@@ -84,9 +94,14 @@ fn main() {
         .map(|paths| paths.map(PathBuf::from).collect())
         .unwrap_or_else(|| vec![PathBuf::from(".")]);
 
+    let size_format = match matches.value_of("size-format") {
+        Some("decimal") => file_size_opts::DECIMAL,
+        _ => file_size_opts::BINARY,
+    };
+
     let verbose = matches.is_present("verbose");
 
     let walk = Walk::new(&paths, num_threads);
     let (size, errors) = walk.run();
-    print_result(size, &errors, verbose);
+    print_result(size, &errors, &size_format, verbose);
 }
