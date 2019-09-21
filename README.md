@@ -10,7 +10,7 @@ a cold disk cache and more than three times faster with a warm disk cache.
 
 ``` bash
 > diskus
-14.56 GB (14556806983 bytes)
+9.59 GB (9,587,408,896 bytes)
 ```
 
 ## Benchmark
@@ -29,32 +29,32 @@ determined via `hyperfine --parameter-scan`.
 ```bash
 sudo -v
 hyperfine --prepare 'sync; echo 3 | sudo tee /proc/sys/vm/drop_caches' \
-    'diskus' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
+    'diskus' 'du -sh' 'sn p -d0 -j8' 'dust -d0'
 ```
 (the `sudo`/`sync`/`drop_caches` commands are a way to
 [clear the filesystem caches between benchmarking runs](https://github.com/sharkdp/hyperfine#io-heavy-programs))
 
-| Command | Mean [s] | Min…Max [s] |
-|:---|---:|---:|
-| `diskus` | 1.649 ± 0.009 | 1.640…1.663 |
-| `sn p -d0 -j8` | 9.701 ± 0.067 | 9.598…9.828 |
-| `du -sb` | 16.039 ± 0.069 | 15.918…16.152 |
-| `dust -d0` | 19.769 ± 0.285 | 19.564…20.561 |
+| Command | Mean [s] | Min [s] | Max [s] | Relative |
+|:---|---:|---:|---:|---:|
+| `diskus` | 1.746 ± 0.017 | 1.728 | 1.770 | 1.00 |
+| `du -sh` | 17.776 ± 0.549 | 17.139 | 18.413 | 10.18 |
+| `sn p -d0 -j8` | 18.094 ± 0.566 | 17.482 | 18.579 | 10.36 |
+| `dust -d0` | 21.357 ± 0.328 | 20.974 | 21.759 | 12.23 |
 
 
 ### Warm disk cache
 
 On a warm disk cache, the differences are smaller:
 ```bash
-hyperfine --warmup 5 'diskus' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
+hyperfine --warmup 5 'diskus' 'du -sh' 'sn p -d0 -j8' 'dust -d0'
 ```
 
-| Command | Mean [s] | Min…Max [s] |
-|:---|---:|---:|
-| `diskus` | 0.314 ± 0.007 | 0.303…0.329 |
-| `sn p -d0 -j8` | 0.622 ± 0.008 | 0.611…0.634 |
-| `du -sb` | 1.130 ± 0.013 | 1.116…1.161 |
-| `dust -d0` | 3.593 ± 0.057 | 3.544…3.743 |
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `diskus` | 500.3 ± 17.3 | 472.9 | 530.6 | 1.00 |
+| `du -sh` | 1098.3 ± 10.0 | 1087.8 | 1122.4 | 2.20 |
+| `sn p -d0 -j8` | 1122.2 ± 18.2 | 1107.3 | 1170.1 | 2.24 |
+| `dust -d0` | 3532.1 ± 26.4 | 3490.0 | 3563.1 | 7.06 |
 
 
 ## Installation
