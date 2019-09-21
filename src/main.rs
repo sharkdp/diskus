@@ -51,7 +51,7 @@ fn main() {
         .setting(AppSettings::DeriveDisplayOrder)
         .setting(AppSettings::UnifiedHelpMessage)
         .version(crate_version!())
-        .about("Compute disk usage for the current directory")
+        .about("Compute disk usage for the given filesystem entries")
         .arg(
             Arg::with_name("path")
                 .multiple(true)
