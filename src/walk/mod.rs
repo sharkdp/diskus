@@ -9,17 +9,7 @@ use rayon::{self, prelude::*};
 
 mod unique_id;
 
-#[cfg(target_os = "windows")]
-mod windows;
-#[cfg(target_os = "windows")]
-pub use self::windows::*;
-
-#[cfg(not(target_os = "windows"))]
-mod unix;
-#[cfg(not(target_os = "windows"))]
-pub use self::unix::*;
-
-use unique_id::UniqueID;
+use unique_id::{generate_unique_id, UniqueID};
 
 pub enum Err {
     NoMetadataForPath(PathBuf),
