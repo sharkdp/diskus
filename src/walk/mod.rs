@@ -5,11 +5,9 @@ use std::thread;
 
 use crossbeam_channel as channel;
 
-use rayon;
-use rayon::prelude::*;
+use rayon::{self, prelude::*};
 
-#[derive(Eq, PartialEq, Hash)]
-pub struct UniqueID(u64, u64);
+mod unique_id;
 
 #[cfg(target_os = "windows")]
 mod windows;
@@ -21,10 +19,13 @@ mod unix;
 #[cfg(not(target_os = "windows"))]
 pub use self::unix::*;
 
+use unique_id::UniqueID;
+
 pub enum Err {
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
 }
+
 enum Message {
     SizeEntry(Option<UniqueID>, u64),
     Error { err: Err },
