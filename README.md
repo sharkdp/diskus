@@ -65,8 +65,8 @@ You can download the latest Debian package from the
 [release page](https://github.com/sharkdp/diskus/releases) and install it via `dpkg`:
 
 ``` bash
-wget "https://github.com/sharkdp/diskus/releases/download/v0.5.0/diskus_0.5.0_amd64.deb"
-sudo dpkg -i diskus_0.5.0_amd64.deb
+wget "https://github.com/sharkdp/diskus/releases/download/v0.6.0/diskus_0.6.0_amd64.deb"
+sudo dpkg -i diskus_0.6.0_amd64.deb
 ```
 
 ### On Arch-based systems
