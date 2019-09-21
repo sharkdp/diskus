@@ -13,6 +13,7 @@ edition = "2018"
 [dependencies]
 num_cpus = "1.0"
 humansize = "1.1"
+num-format = "0.4"
 rayon = "1.0"
 crossbeam-channel = "0.3.0"
 

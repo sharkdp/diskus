@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 use clap::{crate_name, crate_version, App, AppSettings, Arg};
 use humansize::{file_size_opts, FileSize};
+use num_format::{Locale, ToFormattedString};
 
 use crate::walk::Walk;
 
@@ -31,9 +32,9 @@ fn print_result(size: u64, errors: &[walk::Err], verbose: bool) {
         );
     }
     println!(
-        "{} ({} bytes)",
+        "{} ({:} bytes)",
         size.file_size(file_size_opts::DECIMAL).unwrap(),
-        size
+        size.to_formatted_string(&Locale::en)
     );
 }
 
