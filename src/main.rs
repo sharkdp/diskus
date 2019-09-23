@@ -31,7 +31,7 @@ fn print_result(size: u64, errors: &[Error], size_format: &FileSizeOpts, verbose
         );
     }
 
-    if atty::is(atty::Stream::Stdout) {
+    if verbose || atty::is(atty::Stream::Stdout) {
         println!(
             "{} ({:} bytes)",
             size.file_size(size_format).unwrap(),
