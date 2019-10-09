@@ -14,6 +14,7 @@ struct UniqueID(u64, u64);
 
 enum Message {
     SizeEntry(Option<UniqueID>, u64),
+    DirectoryEntry(u64),
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
 }
@@ -21,20 +22,26 @@ enum Message {
 fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
-            // If the entry has more than one hard link, generate
-            // a unique ID consisting of device and inode in order
-            // not to count this entry twice.
-            let unique_id = if metadata.is_file() && metadata.nlink() > 1 {
-                Some(UniqueID(metadata.dev(), metadata.ino()))
-            } else {
-                None
-            };
 
             let size = metadata.len();
 
-            tx_ref.send(Message::SizeEntry(unique_id, size)).unwrap();
+            if metadata.is_file() {
+                // If the entry has more than one hard link, generate
+                // a unique ID consisting of device and inode in order
+                // not to count this entry twice.
+                
+                let unique_id = if metadata.nlink() > 1 {
+                    Some(UniqueID(metadata.dev(), metadata.ino()))
+                } else {
+                    None
+                };
+
+                tx_ref.send(Message::SizeEntry(unique_id, size)).unwrap();
+            }
 
             if metadata.is_dir() {
+                tx_ref.send(Message::DirectoryEntry(size)).unwrap();
+
                 let mut children = vec![];
                 match fs::read_dir(entry) {
                     Ok(child_entries) => {
@@ -74,12 +81,13 @@ impl<'a> Walk<'a> {
         }
     }
 
-    pub fn run(&self) -> (u64, u64) {
+    pub fn run(&self) -> (u64, u64, u64) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
             let mut total = 0;
             let mut file_count = 0;
+            let mut dir_count = 0;
             let mut ids = HashSet::new();
             for msg in rx {
                 match msg {
@@ -94,6 +102,10 @@ impl<'a> Walk<'a> {
                             total += size;
                             file_count += 1;
                         }
+                    }
+                    Message::DirectoryEntry(size) => {
+                        total += size;
+                        dir_count += 1;
                     }
                     Message::NoMetadataForPath(path) => {
                         eprintln!(
@@ -110,7 +122,7 @@ impl<'a> Walk<'a> {
                 }
             }
 
-            (total, file_count)
+            (total, file_count, dir_count)
         });
 
         let pool = rayon::ThreadPoolBuilder::new()
