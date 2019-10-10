@@ -1,29 +1,34 @@
 use std::collections::HashSet;
 use std::fs;
-use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use std::thread;
 
 use crossbeam_channel as channel;
 
-use rayon;
-use rayon::prelude::*;
+use rayon::{self, prelude::*};
 
-#[derive(Eq, PartialEq, Hash)]
-struct UniqueID(u64, u64);
+use crate::filesize::FilesizeType;
+use crate::unique_id::{generate_unique_id, UniqueID};
 
-enum Message {
-    SizeEntry(Option<UniqueID>, u64),
-    DirectoryEntry(u64),
+
+pub enum Error {
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
 }
 
-fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
+enum Message {
+    SizeEntry(Option<UniqueID>, u64),
+    DirectoryEntry(u64),
+    Error { error: Error },
+}
+
+fn walk(tx: channel::Sender<Message>, entries: &[PathBuf], filesize_type: FilesizeType) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
 
-            let size = metadata.len();
+            let unique_id = generate_unique_id(&metadata);
+
+            let size = filesize_type.size(&metadata);
 
             if metadata.is_file() {
                 // If the entry has more than one hard link, generate
@@ -53,16 +58,20 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
                     }
                     Err(_) => {
                         tx_ref
-                            .send(Message::CouldNotReadDir(entry.clone()))
+                            .send(Message::Error {
+                                error: Error::CouldNotReadDir(entry.clone()),
+                            })
                             .unwrap();
                     }
                 }
 
-                walk(tx_ref.clone(), &children[..]);
+                walk(tx_ref.clone(), &children[..], filesize_type);
             };
         } else {
             tx_ref
-                .send(Message::NoMetadataForPath(entry.clone()))
+                .send(Message::Error {
+                    error: Error::NoMetadataForPath(entry.clone()),
+                })
                 .unwrap();
         };
     });
@@ -71,17 +80,23 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf]) {
 pub struct Walk<'a> {
     root_directories: &'a [PathBuf],
     num_threads: usize,
+    filesize_type: FilesizeType,
 }
 
 impl<'a> Walk<'a> {
-    pub fn new(root_directories: &'a [PathBuf], num_threads: usize) -> Walk {
+    pub fn new(
+        root_directories: &'a [PathBuf],
+        num_threads: usize,
+        filesize_type: FilesizeType,
+    ) -> Walk {
         Walk {
             root_directories,
             num_threads,
+            filesize_type,
         }
     }
 
-    pub fn run(&self) -> (u64, u64, u64) {
+    pub fn run(&self) -> (u64, u64, u64, Vec<Error>) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
@@ -89,6 +104,7 @@ impl<'a> Walk<'a> {
             let mut file_count = 0;
             let mut dir_count = 0;
             let mut ids = HashSet::new();
+            let mut error_messages: Vec<Error> = Vec::new();
             for msg in rx {
                 match msg {
                     Message::SizeEntry(unique_id, size) => {
@@ -107,29 +123,19 @@ impl<'a> Walk<'a> {
                         total += size;
                         dir_count += 1;
                     }
-                    Message::NoMetadataForPath(path) => {
-                        eprintln!(
-                            "diskus: could not retrieve metadata for path '{}'",
-                            path.to_string_lossy()
-                        );
-                    }
-                    Message::CouldNotReadDir(path) => {
-                        eprintln!(
-                            "diskus: could not read contents of directory '{}'",
-                            path.to_string_lossy()
-                        );
+                    Message::Error { error } => {
+                        error_messages.push(error);
                     }
                 }
             }
-
-            (total, file_count, dir_count)
+            (total, file_count, dir_count, error_messages)
         });
 
         let pool = rayon::ThreadPoolBuilder::new()
             .num_threads(self.num_threads)
             .build()
             .unwrap();
-        pool.install(|| walk(tx, self.root_directories));
+        pool.install(|| walk(tx, self.root_directories, self.filesize_type));
 
         receiver_thread.join().unwrap()
     }

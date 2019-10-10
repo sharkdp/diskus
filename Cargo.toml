@@ -7,17 +7,27 @@ license = "MIT/Apache-2.0"
 name = "diskus"
 readme = "README.md"
 repository = "https://github.com/sharkdp/diskus"
-version = "0.5.0"
+version = "0.6.0"
+edition = "2018"
 
 [dependencies]
 num_cpus = "1.0"
 humansize = "1.1"
+num-format = "0.4"
 rayon = "1.0"
-crossbeam-channel = "0.3.0"
+crossbeam-channel = "0.3"
+atty = "0.2"
 
 [dependencies.clap]
 version = "2"
 features = ["suggestions", "color", "wrap_help"]
+
+[dev-dependencies]
+tempdir = "0.3"
+
+[[bin]]
+name = "diskus"
+path = "src/main.rs"
 
 [profile.release]
 lto = true

@@ -10,7 +10,7 @@ a cold disk cache and more than three times faster with a warm disk cache.
 
 ``` bash
 > diskus
-14.56 GB (14556806983 bytes)
+9.59 GB (9,587,408,896 bytes)
 ```
 
 ## Benchmark
@@ -29,47 +29,50 @@ determined via `hyperfine --parameter-scan`.
 ```bash
 sudo -v
 hyperfine --prepare 'sync; echo 3 | sudo tee /proc/sys/vm/drop_caches' \
-    'diskus' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
+    'diskus' 'du -sh' 'sn p -d0 -j8' 'dust -d0'
 ```
 (the `sudo`/`sync`/`drop_caches` commands are a way to
 [clear the filesystem caches between benchmarking runs](https://github.com/sharkdp/hyperfine#io-heavy-programs))
 
-| Command | Mean [s] | Min…Max [s] |
-|:---|---:|---:|
-| `diskus` | 1.649 ± 0.009 | 1.640…1.663 |
-| `sn p -d0 -j8` | 9.701 ± 0.067 | 9.598…9.828 |
-| `du -sb` | 16.039 ± 0.069 | 15.918…16.152 |
-| `dust -d0` | 19.769 ± 0.285 | 19.564…20.561 |
+| Command | Mean [s] | Min [s] | Max [s] | Relative |
+|:---|---:|---:|---:|---:|
+| `diskus` | 1.746 ± 0.017 | 1.728 | 1.770 | 1.00 |
+| `du -sh` | 17.776 ± 0.549 | 17.139 | 18.413 | 10.18 |
+| `sn p -d0 -j8` | 18.094 ± 0.566 | 17.482 | 18.579 | 10.36 |
+| `dust -d0` | 21.357 ± 0.328 | 20.974 | 21.759 | 12.23 |
 
 
 ### Warm disk cache
 
 On a warm disk cache, the differences are smaller:
 ```bash
-hyperfine --warmup 5 'diskus' 'sn p -d0 -j8' 'du -sb' 'dust -d0'
+hyperfine --warmup 5 'diskus' 'du -sh' 'sn p -d0 -j8' 'dust -d0'
 ```
 
-| Command | Mean [s] | Min…Max [s] |
-|:---|---:|---:|
-| `diskus` | 0.314 ± 0.007 | 0.303…0.329 |
-| `sn p -d0 -j8` | 0.622 ± 0.008 | 0.611…0.634 |
-| `du -sb` | 1.130 ± 0.013 | 1.116…1.161 |
-| `dust -d0` | 3.593 ± 0.057 | 3.544…3.743 |
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `diskus` | 500.3 ± 17.3 | 472.9 | 530.6 | 1.00 |
+| `du -sh` | 1098.3 ± 10.0 | 1087.8 | 1122.4 | 2.20 |
+| `sn p -d0 -j8` | 1122.2 ± 18.2 | 1107.3 | 1170.1 | 2.24 |
+| `dust -d0` | 3532.1 ± 26.4 | 3490.0 | 3563.1 | 7.06 |
 
 
 ## Installation
 
 ### On Debian-based systems
 
+You can download the latest Debian package from the
+[release page](https://github.com/sharkdp/diskus/releases) and install it via `dpkg`:
+
 ``` bash
-wget "https://github.com/sharkdp/diskus/releases/download/v0.5.0/diskus_0.5.0_amd64.deb"
-sudo dpkg -i diskus_0.5.0_amd64.deb
+wget "https://github.com/sharkdp/diskus/releases/download/v0.6.0/diskus_0.6.0_amd64.deb"
+sudo dpkg -i diskus_0.6.0_amd64.deb
 ```
 
 ### On Arch-based systems
 
 ``` bash
-pacman -Syu diskus
+pacman -S diskus
 ```
 
 Or download [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/) from the AUR.
@@ -78,6 +81,18 @@ Or download [diskus-bin](https://aur.archlinux.org/packages/diskus-bin/) from th
 
 ``` bash
 xbps-install diskus
+```
+
+### On macOS
+
+You can install `diskus` with [Homebrew](https://formulae.brew.sh/formula/diskus):
+```
+brew install diskus
+```
+
+Or with [MacPorts](https://ports.macports.org/port/diskus/summary):
+```
+sudo port install diskus
 ```
 
 ### On Haiku
@@ -100,10 +115,17 @@ Check out the [release page](https://github.com/sharkdp/diskus/releases) for bin
 
 ### Via cargo
 
-If you have Rust 1.29 or higher, you can install `diskus` from source via `cargo`:
+If you have Rust 1.34 or higher, you can install `diskus` from source via `cargo`:
 ```
 cargo install diskus
 ```
+
+## Windows caveats
+
+Windows-internal tools such as Powershell, Explorer or `dir` are not respecting hardlinks or
+junction points when determining the size of a directory. `diskus` does the same and counts
+such entries multiple times (on Unix systems, multiple hardlinks to a single file are counted
+just once).
 
 ## License
 

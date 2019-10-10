@@ -12,9 +12,13 @@ matrix:
     - os: osx
       rust: stable
       env: TARGET=x86_64-apple-darwin
+    - os: windows
+      rust: stable
+      env: TARGET=x86_64-pc-windows-msvc
+
     # Minimum Rust supported channel.
     - os: linux
-      rust: 1.29.0
+      rust: 1.34.0
       env: TARGET=x86_64-unknown-linux-gnu
 
 
@@ -39,7 +43,8 @@ install:
 script:
   # Incorporate TARGET env var to the build and test process
   - cargo build --target $TARGET --verbose
-  #- cargo test --target $TARGET --verbose
+  - cargo test --target $TARGET --verbose
+  - cargo run
 
 before_deploy:
   - bash ci/before_deploy.bash
