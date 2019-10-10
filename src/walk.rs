@@ -31,16 +31,6 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf], filesize_type: Filesi
             let size = filesize_type.size(&metadata);
 
             if metadata.is_file() {
-                // If the entry has more than one hard link, generate
-                // a unique ID consisting of device and inode in order
-                // not to count this entry twice.
-                
-                let unique_id = if metadata.nlink() > 1 {
-                    Some(UniqueID(metadata.dev(), metadata.ino()))
-                } else {
-                    None
-                };
-
                 tx_ref.send(Message::SizeEntry(unique_id, size)).unwrap();
             }
 
