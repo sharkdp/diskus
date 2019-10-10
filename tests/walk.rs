@@ -17,6 +17,7 @@ fn size_of_single_file() -> Result<(), Box<dyn Error>> {
     let num_threads = 1;
     let root_directories = &[PathBuf::from(file_path)];
     let walk = Walk::new(root_directories, num_threads, FilesizeType::ApparentSize);
+
     let (size_in_bytes, file_count, directory_count, errors) = walk.run();
 
     assert!(errors.is_empty());

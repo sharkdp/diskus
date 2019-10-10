@@ -10,7 +10,6 @@ use rayon::{self, prelude::*};
 use crate::filesize::FilesizeType;
 use crate::unique_id::{generate_unique_id, UniqueID};
 
-
 pub enum Error {
     NoMetadataForPath(PathBuf),
     CouldNotReadDir(PathBuf),
@@ -25,7 +24,6 @@ enum Message {
 fn walk(tx: channel::Sender<Message>, entries: &[PathBuf], filesize_type: FilesizeType) {
     entries.into_par_iter().for_each_with(tx, |tx_ref, entry| {
         if let Ok(metadata) = entry.symlink_metadata() {
-
             let unique_id = generate_unique_id(&metadata);
 
             let size = filesize_type.size(&metadata);
