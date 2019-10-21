@@ -15,4 +15,4 @@ mod unique_id;
 pub mod walk;
 
 pub use crate::filesize::FilesizeType;
-pub use crate::walk::{Error, Walk};
+pub use crate::walk::{Error, Walk, WalkResult};

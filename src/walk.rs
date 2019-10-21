@@ -71,6 +71,12 @@ pub struct Walk<'a> {
     filesize_type: FilesizeType,
 }
 
+pub struct WalkResult {
+  pub size_in_bytes: u64,
+  pub file_count: u64,
+  pub directory_count: u64
+}
+
 impl<'a> Walk<'a> {
     pub fn new(
         root_directories: &'a [PathBuf],
@@ -84,7 +90,7 @@ impl<'a> Walk<'a> {
         }
     }
 
-    pub fn run(&self) -> (u64, u64, u64, Vec<Error>) {
+    pub fn run(&self) -> (WalkResult, Vec<Error>) {
         let (tx, rx) = channel::unbounded();
 
         let receiver_thread = thread::spawn(move || {
@@ -116,7 +122,10 @@ impl<'a> Walk<'a> {
                     }
                 }
             }
-            (total, file_count, dir_count, error_messages)
+
+            let result = WalkResult {size_in_bytes: total, file_count: file_count, directory_count: dir_count};
+
+            (result, error_messages)
         });
 
         let pool = rayon::ThreadPoolBuilder::new()

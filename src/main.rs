@@ -5,10 +5,10 @@ use humansize::file_size_opts::{self, FileSizeOpts};
 use humansize::FileSize;
 use num_format::{Locale, ToFormattedString};
 
-use diskus::{Error, FilesizeType, Walk};
+use diskus::{Error, FilesizeType, Walk, WalkResult};
 
 
-fn print_result(size: u64, file_count: u64, dir_count: u64, errors: &[Error], size_format: &FileSizeOpts, verbose: bool) {
+fn print_result(walk_result: WalkResult, errors: &[Error], size_format: &FileSizeOpts, verbose: bool) {
     if verbose {
         for err in errors {
             match err {
@@ -35,13 +35,13 @@ fn print_result(size: u64, file_count: u64, dir_count: u64, errors: &[Error], si
     if atty::is(atty::Stream::Stdout) {
         println!(
             "{} ({:} bytes, {} files, {} directories)",
-            size.file_size(size_format).unwrap(),
-            size.to_formatted_string(&Locale::en),
-            file_count,
-            dir_count
+            walk_result.size_in_bytes.file_size(size_format).unwrap(),
+            walk_result.size_in_bytes.to_formatted_string(&Locale::en),
+            walk_result.file_count,
+            walk_result.directory_count
         );
     } else {
-        println!("{}", size);
+        println!("{}", walk_result.size_in_bytes);
     }
 }
 
@@ -122,6 +122,6 @@ fn main() {
     let verbose = matches.is_present("verbose");
 
     let walk = Walk::new(&paths, num_threads, filesize_type);
-    let (size, file_count, dir_count, errors) = walk.run();
-    print_result(size, file_count, dir_count, &errors, &size_format, verbose);
+    let (walk_result, errors) = walk.run();
+    print_result(walk_result, &errors, &size_format, verbose);
 }
