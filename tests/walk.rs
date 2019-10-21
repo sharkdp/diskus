@@ -18,12 +18,12 @@ fn size_of_single_file() -> Result<(), Box<dyn Error>> {
     let root_directories = &[PathBuf::from(file_path)];
     let walk = Walk::new(root_directories, num_threads, FilesizeType::ApparentSize);
 
-    let (size_in_bytes, file_count, directory_count, errors) = walk.run();
+    let (walk_result, errors) = walk.run();
 
     assert!(errors.is_empty());
-    assert_eq!(size_in_bytes, 100);
-    assert_eq!(file_count, 1);
-    assert_eq!(directory_count, 0);
+    assert_eq!(walk_result.size_in_bytes, 100);
+    assert_eq!(walk_result.file_count, 1);
+    assert_eq!(walk_result.directory_count, 0);
 
     Ok(())
 }
