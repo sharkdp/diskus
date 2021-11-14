@@ -33,10 +33,8 @@ fn walk(tx: channel::Sender<Message>, entries: &[PathBuf], filesize_type: Filesi
                 let mut children = vec![];
                 match fs::read_dir(entry) {
                     Ok(child_entries) => {
-                        for child_entry in child_entries {
-                            if let Ok(child_entry) = child_entry {
-                                children.push(child_entry.path());
-                            }
+                        for child_entry in child_entries.flatten() {
+                            children.push(child_entry.path());
                         }
                     }
                     Err(_) => {
