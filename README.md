@@ -1,6 +1,7 @@
 # diskus
 
 [![CICD](https://github.com/sharkdp/diskus/actions/workflows/CICD.yml/badge.svg)](https://github.com/sharkdp/diskus/actions/workflows/CICD.yml)
+
 *A minimal, fast alternative to `du -sh`.*
 
 `diskus` is a very simple program that computes the total size of the current directory. It is a
