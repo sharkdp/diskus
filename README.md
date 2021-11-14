@@ -65,8 +65,8 @@ You can download the latest Debian package from the
 [release page](https://github.com/sharkdp/diskus/releases) and install it via `dpkg`:
 
 ``` bash
-wget "https://github.com/sharkdp/diskus/releases/download/v0.6.0/diskus_0.6.0_amd64.deb"
-sudo dpkg -i diskus_0.6.0_amd64.deb
+wget "https://github.com/sharkdp/diskus/releases/download/v0.7.0/diskus_0.7.0_amd64.deb"
+sudo dpkg -i diskus_0.7.0_amd64.deb
 ```
 
 ### On Arch-based systems
@@ -115,7 +115,7 @@ Check out the [release page](https://github.com/sharkdp/diskus/releases) for bin
 
 ### Via cargo
 
-If you have Rust 1.34 or higher, you can install `diskus` from source via `cargo`:
+If you have Rust 1.50 or higher, you can install `diskus` from source via `cargo`:
 ```
 cargo install diskus
 ```

@@ -16,6 +16,10 @@
 
 # v0.6.0
 
+- Updated dependencies
+
+# v0.6.0
+
 ## Changes
 
 There is an important change in default behavior: `diskus` will now report "disk usage" instead of "apparent file size", in analogy to what `du -sh` does.
