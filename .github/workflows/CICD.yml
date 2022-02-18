@@ -169,13 +169,16 @@ jobs:
         echo -n "123" > test-directory/file-3-bytes
         echo -n "1234567" > test-directory/file-7-bytes
 
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          curl https://download.sysinternals.com/files/DU.zip --output DU.zip
+          unzip DU.zip
+          ./du64.exe -accepteula -q test-directory/empty-file
+        fi
+
         echo "Disk usage"
         echo "=========="
         ${{ steps.strip.outputs.BIN_PATH }} test-directory
         if [ "$RUNNER_OS" == "Windows" ]; then
-          curl https://download.sysinternals.com/files/DU.zip --output DU.zip
-          unzip DU.zip
-          ./du64.exe -accepteula
           ./du64.exe -q test-directory
         elif [ "$RUNNER_OS" == "macOS" ]; then
           du -c -k test-directory
