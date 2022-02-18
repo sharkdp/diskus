@@ -176,11 +176,13 @@ jobs:
           du -h
           du /?
           du test-directory
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          du -c test-directory
         else
           du -s --block-size=1 test-directory
         fi
 
-        if [ "$RUNNER_OS" != "Windows" ]; then
+        if [ "$RUNNER_OS" == "Linux" ]; then
           echo
           echo "Apparent size"
           echo "============="
