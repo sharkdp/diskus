@@ -177,6 +177,7 @@ jobs:
           unzip DU.zip
           ./du64.exe -q test-directory
         elif [ "$RUNNER_OS" == "macOS" ]; then
+          export BLOCKSIZE=1
           du -c test-directory
         else
           du -s --block-size=1 test-directory
