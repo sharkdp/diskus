@@ -175,6 +175,7 @@ jobs:
         if [ "$RUNNER_OS" == "Windows" ]; then
           curl https://download.sysinternals.com/files/DU.zip --output DU.zip
           unzip DU.zip
+          ./du64.exe -accepteula
           ./du64.exe -q test-directory
         elif [ "$RUNNER_OS" == "macOS" ]; then
           du -c -k test-directory
