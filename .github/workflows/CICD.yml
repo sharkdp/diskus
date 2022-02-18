@@ -160,6 +160,32 @@ jobs:
         command: test
         args: --locked --target=${{ matrix.job.target }} ${{ steps.test-options.outputs.CARGO_TEST_OPTIONS}}
 
+    - name: Integration tests
+      shell: bash
+      run: |
+        mkdir test-directory
+        touch test-directory/empty-file
+        mkdir test-directory/empty-subdirectory
+        echo -n "123" > test-directory/file-3-bytes
+        echo -n "1234567" > test-directory/file-7-bytes
+
+        echo "Disk usage"
+        echo "=========="
+        ${{ steps.strip.outputs.BIN_PATH }} test-directory
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          du test-directory
+        else
+          du -s --block-size=1 test-directory
+        fi
+
+        if [ "$RUNNER_OS" != "Windows" ]; then
+          echo
+          echo "Apparent size"
+          echo "============="
+          ${{ steps.strip.outputs.BIN_PATH }} --apparent-size test-directory
+          du -s --apparent-size --block-size=1 test-directory
+        fi
+
     - name: Create tarball
       id: package
       shell: bash
