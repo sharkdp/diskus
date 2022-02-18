@@ -173,7 +173,7 @@ jobs:
         echo "=========="
         ${{ steps.strip.outputs.BIN_PATH }} test-directory
         if [ "$RUNNER_OS" == "Windows" ]; then
-          curl https://download.sysinternals.com/files/DU.zip --output DU-zip
+          curl https://download.sysinternals.com/files/DU.zip --output DU.zip
           unzip DU.zip
           ./du64.exe -q test-directory
         elif [ "$RUNNER_OS" == "macOS" ]; then
