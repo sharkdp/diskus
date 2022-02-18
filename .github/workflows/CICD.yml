@@ -173,6 +173,8 @@ jobs:
         echo "=========="
         ${{ steps.strip.outputs.BIN_PATH }} test-directory
         if [ "$RUNNER_OS" == "Windows" ]; then
+          du -h
+          du /?
           du test-directory
         else
           du -s --block-size=1 test-directory
