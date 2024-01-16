@@ -205,7 +205,7 @@ jobs:
 
         DPKG_BASENAME=${PROJECT_NAME}
         DPKG_CONFLICTS=${PROJECT_NAME}-musl
-        case ${{ matrix.job.target }} in *-musl) DPKG_BASENAME=${PROJECT_NAME}-musl ; DPKG_CONFLICTS=${PROJECT_NAME} ;; esac;
+        case ${{ matrix.job.target }} in *-musl*) DPKG_BASENAME=${PROJECT_NAME}-musl ; DPKG_CONFLICTS=${PROJECT_NAME} ;; esac;
         DPKG_VERSION=${PROJECT_VERSION}
 
         unset DPKG_ARCH
