@@ -9,6 +9,7 @@ readme = "README.md"
 repository = "https://github.com/sharkdp/diskus"
 version = "0.7.0"
 edition = "2021"
+rust-version = "1.76"
 
 [dependencies]
 num_cpus = "1.0"
