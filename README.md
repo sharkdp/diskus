@@ -115,7 +115,7 @@ Check out the [release page](https://github.com/sharkdp/diskus/releases) for bin
 
 ### Via cargo
 
-If you have Rust 1.50 or higher, you can install `diskus` from source via `cargo`:
+If you have Rust 1.76 or higher, you can install `diskus` from source via `cargo`:
 ```
 cargo install diskus
 ```
