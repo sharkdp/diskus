@@ -64,9 +64,9 @@ pub struct Walk<'a> {
     filesize_type: FilesizeType,
 }
 
-impl<'a> Walk<'a> {
+impl Walk<'_> {
     pub fn new(
-        root_directories: &'a [PathBuf],
+        root_directories: &[PathBuf],
         num_threads: usize,
         filesize_type: FilesizeType,
     ) -> Walk {
