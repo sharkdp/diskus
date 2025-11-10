@@ -14,6 +14,21 @@
 
 ## Packaging
 
+# v0.10.0
+
+## Features
+
+- `diskus` was per default changing its behavior, if it is writing to `stdout`. This might be working well, when writing to files, but causes implicit problems, when piping e.g. into `grep` to determine large elements in a `diskus` output. 
+  This is behavior is now made configurable via `--raw` flag and per default off.
+
+# v0.9.0
+
+## Features
+
+- The default behavior for `diskus` changed, when multiple paths are passed as arguments.
+  Beforehand, there size was aggregated. Now `diskus` returns the sizes for each path separately.
+  One can still tigger aggregation via `-a/--aggregate`.
+
 # v0.6.0
 
 - Updated dependencies

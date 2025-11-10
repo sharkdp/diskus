@@ -76,6 +76,9 @@ impl Walk<'_> {
             filesize_type,
         }
     }
+    pub fn get_root_directories(&self) -> &[PathBuf] {
+        self.root_directories
+    }
 
     pub fn run(&self) -> (u64, Vec<Error>) {
         let (tx, rx) = channel::unbounded();

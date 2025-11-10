@@ -14,8 +14,14 @@ Set the number of threads (default: 3 x num cores)
 Output format for file sizes (decimal: MB, binary: MiB) [default: decimal]
 [possible values: decimal, binary]
 .TP
+\fB\-v\fR, \fB\-\-raw\fR
+Output raw numbers of bytes and do not apply any formatting via \fB\-\-size\-format\fR.
+.TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Do not hide filesystem errors
+.TP
+\fB\-a\fR, \fB\-\-aggregate\fR
+Aggregate sizes of all passed filesystem paths
 .TP
 \fB\-b\fR, \fB\-\-apparent\-size\fR
 Compute apparent size instead of disk usage

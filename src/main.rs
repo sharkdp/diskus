@@ -1,13 +1,15 @@
 use std::path::PathBuf;
+use std::io::{self, Write};
 
 use clap::{crate_name, crate_version, App, AppSettings, Arg};
 use humansize::file_size_opts::{self, FileSizeOpts};
 use humansize::FileSize;
 use num_format::{Locale, ToFormattedString};
+use tabwriter::TabWriter;
 
 use diskus::{Error, FilesizeType, Walk};
 
-fn print_result(size: u64, errors: &[Error], size_format: &FileSizeOpts, verbose: bool) {
+fn build_message(path: Option<&PathBuf>, size: u64, errors: &[Error], size_format: &FileSizeOpts, raw: bool, verbose: bool) -> String {
     if verbose {
         for err in errors {
             match err {
@@ -31,14 +33,47 @@ fn print_result(size: u64, errors: &[Error], size_format: &FileSizeOpts, verbose
         );
     }
 
-    if atty::is(atty::Stream::Stdout) {
-        println!(
-            "{} ({:} bytes)",
-            size.file_size(size_format).unwrap(),
-            size.to_formatted_string(&Locale::en)
+    let path_info = path.map(|p| format!("\t{}", p.to_string_lossy())).unwrap_or_default();
+    if raw {
+        format!("{}{}", size, path_info)
+    } else {
+        let human_readable_size = size.file_size(size_format).unwrap();
+        let size_in_bytes = size.to_formatted_string(&Locale::en);
+        if verbose {
+            format!("{} ({:} bytes){}", human_readable_size, size_in_bytes, path_info)
+        } else {
+            format!("{}{}", human_readable_size, path_info)
+        }
+    }
+}
+
+
+fn perform_walks(walks: Vec<Walk>, aggregate: bool, size_format: FileSizeOpts, raw: bool, verbose: bool) {
+    if aggregate {
+        let mut total_size = 0;
+        let mut all_errors = Vec::new();
+
+        for walk in walks {
+            let (size, errors) = walk.run();
+            total_size += size;
+            all_errors.extend(errors);
+        }
+
+        println!("{}",
+            build_message(None, total_size, &all_errors, &size_format, raw, verbose)
         );
     } else {
-        println!("{}", size);
+        let mut tw = TabWriter::new(io::stdout()).padding(2);
+        for walk in walks {
+            // each Walk knows its own root_directories
+            let (size, errors) = walk.run();
+            assert_eq!(walk.get_root_directories().len(), 1, "perform_walks can only be called without aggregation with a single root directory");
+            let path = &walk.get_root_directories()[0];
+            writeln!(tw, "{}",
+                build_message(Some(path), size, &errors, &size_format, raw, verbose)
+            ).unwrap();
+        }
+        tw.flush().unwrap();
     }
 }
 
@@ -73,11 +108,24 @@ fn main() {
                 .help("Output format for file sizes (decimal: MB, binary: MiB)"),
         )
         .arg(
+            Arg::with_name("raw")
+                .long("raw")
+                .takes_value(false)
+                .help("Instead of human-readable sizes uses raw numbers in bytes. Makes the system ignore the parameter \"size-format\"."),
+        )
+        .arg(
             Arg::with_name("verbose")
                 .long("verbose")
                 .short("v")
                 .takes_value(false)
                 .help("Do not hide filesystem errors"),
+        )
+        .arg(
+            Arg::with_name("aggregate")
+                .long("aggregate")
+                .short("a")
+                .takes_value(false)
+                .help("Aggregate sizes across all provided paths"),
         );
 
     #[cfg(not(windows))]
@@ -116,9 +164,17 @@ fn main() {
         _ => file_size_opts::BINARY,
     };
 
+    let raw = matches.is_present("raw");
     let verbose = matches.is_present("verbose");
+    let aggregate = matches.is_present("aggregate");
+    let walks: Vec<Walk> = if aggregate {
+        vec![Walk::new(&paths, num_threads, filesize_type)]
+    } else {
+        paths
+            .iter()
+            .map(|p| Walk::new(std::slice::from_ref(p), num_threads, filesize_type))
+            .collect()
+    };
 
-    let walk = Walk::new(&paths, num_threads, filesize_type);
-    let (size, errors) = walk.run();
-    print_result(size, &errors, &size_format, verbose);
+    perform_walks(walks, aggregate, size_format, raw, verbose);
 }
