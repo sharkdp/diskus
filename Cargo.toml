@@ -17,7 +17,6 @@ cli = [
     "dep:clap",
     "dep:humansize",
     "dep:num-format",
-    "dep:atty",
 ]
 
 [dependencies]
@@ -28,7 +27,6 @@ crossbeam-channel = "0.5"
 # CLI dependencies (optional)
 humansize = { version = "2.1", optional = true }
 num-format = { version = "0.4", optional = true }
-atty = { version = "0.2", optional = true }
 clap = { version = "4.5", features = [
     "suggestions",
     "color",
