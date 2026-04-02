@@ -21,7 +21,7 @@ interest since all programs would finish in a reasonable time that would not int
 
 In addition to `du` and `diskus`, we also add [tin-summer](https://github.com/vmchale/tin-summer) (`sn`) and
 [`dust`](https://github.com/bootandy/dust) in our comparison. Both are also written in Rust and provide
-much more features than `diskus` (check them out!). The optimal number of threads for `sn` (`-j` option) was
+many more features than `diskus` (check them out!). The optimal number of threads for `sn` (`-j` option) was
 determined via `hyperfine --parameter-scan`.
 
 ### Cold disk cache
