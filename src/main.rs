@@ -7,7 +7,7 @@ use num_format::{Locale, ToFormattedString};
 
 use diskus::{CountType, Directories, DiskUsage, DiskUsageResult, Error};
 
-fn print_result(result: &DiskUsageResult, size_format: FormatSizeOptions, verbose: bool) {
+fn print_result(result: &DiskUsageResult, size_format: FormatSizeOptions, verbose: bool, path_to_print: Option<&PathBuf>) {
     if verbose {
         for err in result.errors() {
             match err {
@@ -32,14 +32,21 @@ fn print_result(result: &DiskUsageResult, size_format: FormatSizeOptions, verbos
     }
 
     let size = result.ignore_errors().size_in_bytes();
+    let path_str = if let Some(path) = path_to_print {
+        format!("\t{}", path.display())
+    } else {
+        String::new()
+    };
+
     if stdout().is_terminal() {
         println!(
-            "{} ({:} bytes)",
+            "{} ({:} bytes){}",
             format_size(size, size_format),
-            size.to_formatted_string(&Locale::en)
+            size.to_formatted_string(&Locale::en),
+            path_str
         );
     } else {
-        println!("{}", size);
+        println!("{}{}", size, path_str);
     }
 }
 
@@ -73,6 +80,12 @@ fn main() {
                 .short('v')
                 .action(ArgAction::SetTrue)
                 .help("Do not hide filesystem errors"),
+        )
+        .arg(
+            Arg::new("print-path")
+                .long("print-path")
+                .action(ArgAction::SetTrue)
+                .help("Print the path in the output"),
         )
         .arg(
             Arg::new("directories")
@@ -119,11 +132,24 @@ fn main() {
     };
 
     let verbose = matches.get_flag("verbose");
+    let print_path = matches.get_flag("print-path");
+
+    // Reject --print-path with multiple paths
+    if print_path && paths.len() > 1 {
+        eprintln!("error: --print-path cannot be used with multiple paths");
+        std::process::exit(1);
+    }
 
     let directories = match matches.get_one::<String>("directories").map(|s| s.as_str()) {
         Some("included") => Directories::Included,
         Some("excluded") => Directories::Excluded,
         _ => Directories::Auto,
+    };
+
+    let path_to_print = if print_path {
+        paths.first().cloned()
+    } else {
+        None
     };
 
     let mut disk_usage = DiskUsage::new(paths)
@@ -133,5 +159,5 @@ fn main() {
         disk_usage = disk_usage.num_workers(n);
     }
     let result = disk_usage.count();
-    print_result(&result, size_format, verbose);
+    print_result(&result, size_format, verbose, path_to_print.as_ref());
 }
